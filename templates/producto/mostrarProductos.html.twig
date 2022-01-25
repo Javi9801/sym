@@ -1,0 +1,7 @@
+<h1>Productos Sacados por Categoria</h1>
+<ul>
+    {% for producto in productos %}
+        <li>Nombre: {{ producto.name }}; Categoria: {{producto.category.id}}</li>
+
+    {% endfor %}
+</ul>

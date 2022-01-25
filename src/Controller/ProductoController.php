@@ -6,6 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Entity\Producto;
+use App\Entity\Category;
 use Symfony\Component\Routing\Annotation\Route;
 
 class ProductoController extends AbstractController
@@ -18,8 +19,17 @@ class ProductoController extends AbstractController
         $entityManager = $doctrine->getManager();
         $producto = new Producto();
 
-        $producto->setName('Keyboard');
-        $producto->setPrecio(12999);
+        $category = $doctrine->getRepository(Category::class)->find(1);
+
+        if (!$category) {
+            throw $this->createNotFoundException(
+                'No category found for id '.$id
+            );
+        }
+
+        $producto->setName('Raton');
+        $producto->setPrecio(1457);
+        $producto->setCategory($category);
 
         $entityManager->persist($producto);
         $entityManager->flush();
@@ -47,4 +57,27 @@ class ProductoController extends AbstractController
         return $this->render('producto/mostrarProducto.html.twig', ['producto' => $producto->getName()]);
     }
 
+
+     /**
+     * @Route("/producto/mostrarProductos/{idCategoria}", methods={"GET","HEAD"}), name="product_show")
+     */
+    public function mostrarProductos(ManagerRegistry $doctrine, int $idCategoria): Response
+    {
+        $categoria = $doctrine->getRepository(Category::class)->find($idCategoria);
+
+        if (!$categoria) {
+            throw $this->createNotFoundException(
+                'Productos con categoria '.$idCategoria.' no encontrado'
+            );
+        } else {
+
+        $productos = $categoria->getProductos();
+
+
+        // or render a template
+        // in the template, print things with {{ product.name }}
+
+            return $this->render('producto/mostrarProductos.html.twig', ['productos' => $productos]);
+        }
+    }
 }

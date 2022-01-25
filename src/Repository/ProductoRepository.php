@@ -47,4 +47,24 @@ class ProductoRepository extends ServiceEntityRepository
         ;
     }
     */
+
+
+     /**
+     * @return Product[]
+     */
+    public function findAllByIdCategoria(int $idCategoria): array
+    {
+        $entityManager = $this->getEntityManager();
+
+        $query = $entityManager->createQuery(
+            'SELECT p
+            FROM App\Entity\Producto p
+            WHERE p.category_id > :category_id
+            ORDER BY p.id ASC'
+        )->setParameter('category_id', $idCategoria);
+
+        // returns an array of Product objects
+        return $query->getResult();
+    }
+
 }
