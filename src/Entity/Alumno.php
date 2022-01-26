@@ -6,7 +6,7 @@ use App\Repository\AlumnoRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-
+use App\Entity\Asignatura;
 /**
  * @ORM\Entity(repositoryClass=AlumnoRepository::class)
  */
@@ -24,11 +24,16 @@ class Alumno
      */
     private $nombre;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=AlumnoAsignatura::class, inversedBy="alumno")
-     * @ORM\JoinColumn(nullable=false)
+   /**
+     * @ORM\ManyToMany(targetEntity=Asignatura::class, inversedBy="alumnos")
      */
-    private $alumnoAsignatura;
+    private $asignaturas;
+
+    public function __construct()
+    {
+        $this->asignaturas = new ArrayCollection();
+    }
+
 
 
     public function getId(): ?int
@@ -48,17 +53,28 @@ class Alumno
         return $this;
     }
 
-    public function getAlumnoAsignatura(): ?AlumnoAsignatura
+/**
+     * @return Collection|Asignatura[]
+     */
+    public function getAsignaturas(): Collection
     {
-        return $this->alumnoAsignatura;
+        return $this->asignaturas;
     }
 
-    public function setAlumnoAsignatura(?AlumnoAsignatura $alumnoAsignatura): self
+    public function addAsignatura(Asignatura $asignaturas): self
     {
-        $this->alumnoAsignatura = $alumnoAsignatura;
+        if (!$this->asignaturas->contains($asignaturas)) {
+            $this->asignaturas[] = $asignaturas;
+        }
 
         return $this;
     }
 
+    public function removeAsignatura(Asignatura $asignaturas): self
+    {
+        $this->asignatura->removeElement($asignaturas);
+
+        return $this;
+    }
 
 }

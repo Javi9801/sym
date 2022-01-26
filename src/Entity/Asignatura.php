@@ -24,12 +24,50 @@ class Asignatura
      */
     private $descripcion;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=AlumnoAsignatura::class, inversedBy="Asignatura")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $alumnoAsignatura;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=Alumno::class, mappedBy="asignaturas")
+     */
+
+
+    private $alumnos;
+
+    public function __construct()
+    {
+        $this->alumno = new ArrayCollection();
+    }
+
+
+
+   /**
+     * @return Collection|Alumno[]
+     */
+    public function getAlumnos(): Collection
+    {
+        return $this->alumnos;
+    }
+
+    public function addAlumno(Alumno $alumnos): self
+    {
+        if (!$this->alumnos->contains($alumnos)) {
+            $this->alumnos[] = $alumnos;
+            $alumnos->addAsignatura($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAlumno(Alumno $alumnos): self
+    {
+        if ($this->alumno->removeElement($alumnos)) {
+            // set the owning side to null (unless already changed)
+
+            $alumnos->removeAsignatura($this);
+
+        }
+
+        return $this;
+    }
 
     public function getId(): ?int
     {
@@ -44,18 +82,6 @@ class Asignatura
     public function setDescripcion(string $descripcion): self
     {
         $this->descripcion = $descripcion;
-
-        return $this;
-    }
-
-    public function getAlumnoAsignatura(): ?AlumnoAsignatura
-    {
-        return $this->alumnoAsignatura;
-    }
-
-    public function setAlumnoAsignatura(?AlumnoAsignatura $alumnoAsignatura): self
-    {
-        $this->alumnoAsignatura = $alumnoAsignatura;
 
         return $this;
     }
