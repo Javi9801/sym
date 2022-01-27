@@ -1,12 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-</head>
-<body>
+{% extends 'base.html.twig' %}
+
+{% block title %}Mostrar Alumnos{% endblock %}
+
+
+{% block content %}
 
 <h1>Alumnos</h1>
 
@@ -15,5 +12,8 @@
 
     {% endfor %}
 
-</body>
-</html>
+
+{% endblock %}
+
+
+
