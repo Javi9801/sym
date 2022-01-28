@@ -1,7 +1,7 @@
-<h1>Productos Sacados por Categoria</h1>
+<h1>Productos Sacados por Categoria</h1> <a href="http://localhost:8000/producto/formulario_producto">Crear</a>
 <ul>
     {% for producto in productos %}
-        <li>Nombre: {{ producto.name }}; Categoria: {{producto.category.id}}</li>
 
+    <li>Nombre: {{ producto.name }}; Categoria: {{producto.category.id}}; Descripcion: {{producto.descripcion}}; Precio: {{producto.precio}}</li><a href="http://localhost:8000/producto/borrar/{{producto.id}}">Borrar</a>
     {% endfor %}
 </ul>

@@ -7,7 +7,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Entity\Producto;
 use App\Entity\Category;
+use App\Form\Type\ProductoType;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Request;
 
 class ProductoController extends AbstractController
 {
@@ -27,9 +29,11 @@ class ProductoController extends AbstractController
             );
         }
 
-        $producto->setName('Raton');
-        $producto->setPrecio(1457);
+        $producto->setName('Monitor');
+        $producto->setPrecio(500);
         $producto->setCategory($category);
+        $producto->setDescripcion("Viene con los cables");
+
 
         $entityManager->persist($producto);
         $entityManager->flush();
@@ -59,17 +63,11 @@ class ProductoController extends AbstractController
 
 
      /**
-     * @Route("/producto/mostrarProductos/{idCategoria}", methods={"GET","HEAD"}), name="product_show")
+     * @Route("/producto/mostrarProductos", methods={"GET","HEAD"}), name="productos")
      */
-    public function mostrarProductos(ManagerRegistry $doctrine, int $idCategoria): Response
+    public function mostrarProductos(ManagerRegistry $doctrine): Response
     {
-        $categoria = $doctrine->getRepository(Category::class)->find($idCategoria);
-
-        if (!$categoria) {
-            throw $this->createNotFoundException(
-                'Productos con categoria '.$idCategoria.' no encontrado'
-            );
-        } else {
+        $categoria = $doctrine->getRepository(Category::class)->find(1);
 
         $productos = $categoria->getProductos();
 
@@ -78,6 +76,55 @@ class ProductoController extends AbstractController
         // in the template, print things with {{ product.name }}
 
             return $this->render('producto/mostrarProductos.html.twig', ['productos' => $productos]);
+
+    }
+
+
+
+ /**
+     * @Route("/producto/formulario_producto", name="form_producto")
+     */
+    public function new(ManagerRegistry $doctrine, Request $request): Response
+    {
+        // just set up a fresh $task object (remove the example data)
+        $producto = new Producto();
+        $entityManager = $doctrine->getManager();
+        $category = $doctrine->getRepository(Category::class)->find(1);
+
+        $form = $this->createForm(ProductoType::class, $producto);
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            // $form->getData() holds the submitted values
+            // but, the original `$task` variable has also been updated
+            $producto = $form->getData();
+            $producto->setCategory($category);
+            $entityManager->persist($producto);
+            $entityManager->flush();
+
+
+
+            // ... perform some action, such as saving the task to the database
+
+            return $this->redirectToRoute('app_producto_mostrarproductos');
         }
+
+        return $this->renderForm('producto/formulario_producto.html.twig', [
+            'form' => $form,
+        ]);
+    }
+
+    /**
+     * @Route("/producto/borrar/{id}", name="borrar")
+     */
+    public function borrar(ManagerRegistry $doctrine, int $id): Response
+    {
+        $entityManager = $doctrine->getManager();
+        $repository = $doctrine->getRepository(Producto::class);
+        $producto = $repository->find($id);
+        $entityManager->remove($producto);
+        $entityManager->flush();
+
+        return $this->redirectToRoute('app_producto_mostrarproductos');
     }
 }
